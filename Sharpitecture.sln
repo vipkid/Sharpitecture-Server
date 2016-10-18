@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharpitecture", "Sharpitecture.csproj", "{DB94DC49-C8CE-4D59-B5DE-55FA23976392}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{0BB55395-B69E-43B6-8F5D-FF5F11981CDE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DB94DC49-C8CE-4D59-B5DE-55FA23976392}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB94DC49-C8CE-4D59-B5DE-55FA23976392}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB94DC49-C8CE-4D59-B5DE-55FA23976392}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB94DC49-C8CE-4D59-B5DE-55FA23976392}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0BB55395-B69E-43B6-8F5D-FF5F11981CDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BB55395-B69E-43B6-8F5D-FF5F11981CDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0BB55395-B69E-43B6-8F5D-FF5F11981CDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0BB55395-B69E-43B6-8F5D-FF5F11981CDE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
