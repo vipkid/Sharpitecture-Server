@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Sharpitecture.Groups;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 
 namespace Sharpitecture
 {
@@ -9,16 +11,18 @@ namespace Sharpitecture
         private static Dictionary<string, string> _configurations;
 
         public const string Name = "server-name",
-                            MOTD = "server-motd";
+                            MOTD = "server-motd",
+                            DefaultRank = "default-rank";
 
         public static void Initialise()
         {
-            _configurations = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            AddConfig<string>(Name, "Sharpitecture Server");
-            AddConfig<string>(MOTD, "Work in progress....");
+            if (!_configurations.ContainsKey(Name)) Add<string>(Name, "Sharpitecture Server");
+            if (!_configurations.ContainsKey(MOTD)) Add<string>(MOTD, "Work in progress....");
+            if (!_configurations.ContainsKey(DefaultRank)) Add<string>(DefaultRank, "player");
+            Save();
         }
 
-        public static T GetConfig<T>(string configName)
+        public static T Get<T>(string configName)
         {
             T value = default(T);
 
@@ -41,13 +45,32 @@ namespace Sharpitecture
             return value;
         }
         
-        public static bool AddConfig<T>(string configName, string value = null)
+        public static bool Add<T>(string configName, string value = null)
         {
             if (TypeDescriptor.GetConverter(typeof(T)) == null)
                 return false;
 
             _configurations.Add(configName, value);
             return true;
+        }
+
+        public static void Load()
+        {
+            _configurations = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            if (!Directory.Exists("properties")) { Directory.CreateDirectory("properties"); }
+
+            PropertyFile file = new PropertyFile("properties/server.properties");
+            file.LoadProperties(_configurations);
+            file.Save();
+        }
+
+        public static void Save()
+        {
+            PropertyFile file = new PropertyFile("properties/server.properties");
+            file.LoadProperties();
+            foreach (string key in _configurations.Keys)
+                file.SetProperty(key, _configurations[key]);
+            file.Save();
         }
     }
 }

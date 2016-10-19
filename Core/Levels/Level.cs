@@ -1,5 +1,6 @@
 ﻿using Sharpitecture.Entities;
 using Sharpitecture.Levels.Blocks;
+using Sharpitecture.Levels.Seeds;
 using Sharpitecture.Maths;
 using Sharpitecture.Networking;
 using System;
@@ -15,7 +16,8 @@ namespace Sharpitecture.Levels
         private readonly ushort _height;
         private Vector3S _spawnPosition;
         private string _name;
-        private byte[] Blocks;
+        public byte[] Blocks { get; private set; }
+        public readonly byte[] UUID = new byte[16];
         private byte[][] PhyBlocks;
         private BlockDefinitions _blockDefs;
 
@@ -81,7 +83,7 @@ namespace Sharpitecture.Levels
             get
             {
                 if (_loadingTitle == null)
-                    _loadingTitle = Config.GetConfig<string>(Config.Name);
+                    _loadingTitle = Config.Get<string>(Config.Name);
                 return _loadingTitle;
             }
             internal set
@@ -119,6 +121,8 @@ namespace Sharpitecture.Levels
         {
             _blockDefs = new BlockDefinitions();
             _npcs = new List<Entity>();
+
+            Seed.Seeds[0].Generate(this, CoreBlock.Grass, CoreBlock.Dirt);
         }
 
         public byte[] Serialize(bool customBlocks, bool blockDefinitions)
@@ -164,9 +168,9 @@ namespace Sharpitecture.Levels
             });
         }
 
-        public int PosToInt(short x, short y, short z) => x + Width * (y + Height * z);
+        public int PosToInt(short x, short y, short z) => x + Width * (z + Depth * y);
         public int PosToInt(Vector3S pos) => PosToInt(pos.X, pos.Y, pos.Z);
-        public bool InRange(short x, short y, short z) => x >= 0 && x < Width && y >= 0 && y < Height && z > 0 && z < Depth;
+        public bool InRange(short x, short y, short z) => (x >= 0 && x < Width) && (y >= 0 && y < Height) && (z >= 0 && z < Depth);
         public bool InRange(Vector3S pos) => InRange(pos.X, pos.Y, pos.Z);
 
         public byte GetTile(short x, short y, short z)

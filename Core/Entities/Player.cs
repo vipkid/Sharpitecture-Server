@@ -1,10 +1,13 @@
-﻿using Sharpitecture.Chatting;
+﻿using Sharpitecture.API.Commands;
+using Sharpitecture.Chatting;
+using Sharpitecture.Groups;
 using Sharpitecture.Levels;
 using Sharpitecture.Maths;
 using Sharpitecture.Networking;
 using Sharpitecture.Utils.Logging;
 using System;
 using System.Text;
+using System.Threading;
 
 namespace Sharpitecture.Entities
 {
@@ -15,6 +18,15 @@ namespace Sharpitecture.Entities
         private bool _canHack = true;
         private bool _useCustomBlocks;
         private bool _useBlockDefinitions;
+        private Thread _cdThread;
+
+        public override string ChatName
+        {
+            get
+            {
+                return ChatColour + Group.Prefix + " " + Name;
+            }
+        }
 
         public Player(Connection conn)
         {
@@ -24,11 +36,9 @@ namespace Sharpitecture.Entities
 
         private void HandleMessages(ByteBuffer buffer)
         {
-            //Logger.Log("Read start", LogType.Debug);
             while (buffer.Position > 0)
             {
                 byte packetId = buffer.ReadByte();
-                //Logger.LogF("Parsing packet ID: {0}", LogType.Debug, packetId);
 
                 switch (packetId)
                 {
@@ -58,8 +68,13 @@ namespace Sharpitecture.Entities
             HoverName = username;
             Name = username;
 
-            SendLoadingScreen(Config.GetConfig<string>(Config.Name), Config.GetConfig<string>(Config.MOTD));
+            SendLoadingScreen(Config.Get<string>(Config.Name), Config.Get<string>(Config.MOTD));
             SendToMap(Server.MainLevel);
+
+            Group = Group.FindPlayerRank(Name);
+            ChatColour = Group.DefaultColor;
+
+            SendMessage("&eYou are a " + Group.DefaultColor + Group.Name + "&e!");
 
             Server.Players.Add(this);
         }
@@ -97,7 +112,38 @@ namespace Sharpitecture.Entities
             byte unused = buffer.ReadByte();
             string rawMessage = buffer.ReadString(_useCP437 ? Server.CP437 : Encoding.ASCII);
 
-            string fullMessage = ChatName + ": " + rawMessage;
+            if (rawMessage.StartsWith("/"))
+            {
+                rawMessage = rawMessage.Remove(0, 1);
+                string parameters = string.Empty;
+                if (rawMessage.IndexOf(' ') != -1)
+                {
+                    string[] parts = rawMessage.Split(new char[] { ' ' }, 2);
+                    rawMessage = parts[0];
+                    parameters = parts[1];
+                }
+
+                Command cd;
+                if ((cd = Command.Find(rawMessage)) == null)
+                {
+                    SendMessage("Could not find command '" + rawMessage + "'");
+                    return;
+                }
+
+                try {
+                    _cdThread = new Thread(() => cd.Handler(this, parameters));
+                    _cdThread.Start();
+                } catch(Exception ex) {
+                    SendMessage("An error occurred when using the command");
+                    SendMessage("Message: &c" + ex.Message);
+                    Logger.LogF("{0} trigged a command error", LogType.Error, Name);
+                    Logger.LogF("Message: {0}", LogType.Error, ex.Message);
+                }
+
+                return;
+            }
+
+            string fullMessage = ChatName + ": &f" + rawMessage;
             Chat.MessageAll(fullMessage);
         }
 
@@ -132,7 +178,6 @@ namespace Sharpitecture.Entities
                 buffer.WriteShort(length);
                 buffer.Write(data, position, length);
                 position += length;
-                buffer.SetPosition(1027);
                 buffer.WriteByte((byte)(position * 256F / data.Length));
                 SendRaw(buffer.Data);
                 buffer.SetPosition(1);
@@ -254,7 +299,7 @@ namespace Sharpitecture.Entities
             {
                 buffer.WriteByte(Opcodes.Message.id);
                 buffer.WriteByte(0);
-                buffer.WriteString(message, _useCP437 ? Server.CP437 : Encoding.ASCII);
+                buffer.WriteString(line, _useCP437 ? Server.CP437 : Encoding.ASCII);
                 SendRaw(buffer.Data);
                 buffer.SetPosition(0);
             }

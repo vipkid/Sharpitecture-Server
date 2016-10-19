@@ -28,9 +28,9 @@ namespace Sharpitecture.Levels.Seeds
                 Logger.LogF("Parameters passed: {0}, {1}", LogType.Error, parameters[0], parameters[1]);
             }
 
-            for (short x = 0; x < level.Width; x++)
-                for (short z = 0; z < level.Depth; z++)
-                    for (short y = 0; y <= halfWay; y++)
+            for (short x = 0; x < level.Width; ++x)
+                for (short z = 0; z < level.Depth; ++z)
+                    for (short y = 0; y <= halfWay; ++y)
                         level.SetTile(x, y, z, y == halfWay ? surface : underground);
         }
     }

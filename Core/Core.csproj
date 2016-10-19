@@ -49,6 +49,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\Commands\Command.cs" />
+    <Compile Include="API\Commands\DevCommands.cs" />
     <Compile Include="Chatting\Chat.cs" />
     <Compile Include="Chatting\Colour.cs" />
     <Compile Include="Chatting\ColourDefinitions.cs" />
@@ -61,12 +63,28 @@
     <Compile Include="Entities\EntityHandler.cs" />
     <Compile Include="Entities\Player.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="Groups\Group.cs" />
+    <Compile Include="Groups\GroupList.cs" />
     <Compile Include="Levels\Blocks\CoreBlock.cs" />
     <Compile Include="Levels\Blocks\BlockDefinitions.cs" />
     <Compile Include="Levels\Blocks\RenderType.cs" />
     <Compile Include="Levels\Blocks\Solidity.cs" />
     <Compile Include="Levels\Blocks\WalkSound.cs" />
     <Compile Include="API\Level.API.cs" />
+    <Compile Include="Levels\IO\DatLoader.cs" />
+    <Compile Include="Levels\IO\LvlLoader.cs" />
+    <Compile Include="Levels\IO\NbtLoader.cs" />
+    <Compile Include="Levels\IO\NBT\INbtField.cs" />
+    <Compile Include="Levels\IO\NBT\NbtByte.cs" />
+    <Compile Include="Levels\IO\NBT\NbtByteArray.cs" />
+    <Compile Include="Levels\IO\NBT\NbtCompound.cs" />
+    <Compile Include="Levels\IO\NBT\NbtDouble.cs" />
+    <Compile Include="Levels\IO\NBT\NbtFile.cs" />
+    <Compile Include="Levels\IO\NBT\NbtFloat.cs" />
+    <Compile Include="Levels\IO\NBT\NbtInt.cs" />
+    <Compile Include="Levels\IO\NBT\NbtLong.cs" />
+    <Compile Include="Levels\IO\NBT\NbtShort.cs" />
+    <Compile Include="Levels\IO\NBT\NbtString.cs" />
     <Compile Include="Levels\Level.cs" />
     <Compile Include="Levels\Seeds\FlatSeed.cs" />
     <Compile Include="Maths\Vector3B.cs" />
@@ -87,6 +105,7 @@
     <Compile Include="Utils\Logging\Log.cs" />
     <Compile Include="Utils\Logging\Logger.cs" />
     <Compile Include="Utils\Logging\LogType.cs" />
+    <Compile Include="Utils\PropertyFile.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -98,6 +117,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.103\build\net20\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.103\build\net20\System.Data.SQLite.Core.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

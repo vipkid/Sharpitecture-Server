@@ -9,7 +9,7 @@ namespace Sharpitecture.Levels.Seeds
 
         internal static List<Seed> Seeds = new List<Seed>();
 
-		public static void Initialize()
+		public static void Initialise()
         {
             Seeds.Add(new FlatSeed());
         }

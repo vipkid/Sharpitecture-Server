@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.ComponentModel;
+using System.IO;
 using System.IO.Compression;
 
 namespace Sharpitecture
@@ -27,6 +28,29 @@ namespace Sharpitecture
 
                 return ms.ToArray();
             }
+        }
+
+        /// <summary>
+        /// Converts a string to a generic type
+        /// Based off: http://stackoverflow.com/questions/2961656/generic-tryparse
+        /// </summary>
+        public static bool Convert<T, T1>(this T1 input, out T value)
+        {
+            value = default(T);
+            var converter = TypeDescriptor.GetConverter(typeof(T));
+            if (converter != null)
+            {
+                try
+                {
+                    value = (T)converter.ConvertFromString(input.ToString());
+                }
+                catch
+                {
+                    return false;
+                }
+                return true;
+            }
+            return false;
         }
     }
 }

@@ -61,12 +61,35 @@ namespace Sharpitecture.Networking
             Write(BitConverter.GetBytes(val), 0, 4);
         }
 
-        public void WriteString(string text, Encoding encoding)
+        public void WriteFloat(float val)
         {
-            text = text.PadRight(64);
-            if (text.Length > 64) text = text.Substring(0, 64);
+            byte[] bytes = BitConverter.GetBytes(val);
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(bytes);
+            Write(bytes, 0, 4);
+        }
 
-            Write(encoding.GetBytes(text), 0, 64);
+        public void WriteLong(long val)
+        {
+            if (BitConverter.IsLittleEndian)
+                val = IPAddress.HostToNetworkOrder(val);
+            Write(BitConverter.GetBytes(val), 0, 2);
+        }
+
+        public void WriteDouble(double val)
+        {
+            byte[] bytes = BitConverter.GetBytes(val);
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(bytes);
+            Write(bytes, 0, 8);
+        }
+
+        public void WriteString(string text, Encoding encoding, int length = 64)
+        {
+            text = text.PadRight(length);
+            if (text.Length > length) text = text.Substring(0, length);
+
+            Write(encoding.GetBytes(text), 0, length);
         }
 
         public void WriteBoolean(bool val) => WriteByte((byte)(val ? 1 : 0));

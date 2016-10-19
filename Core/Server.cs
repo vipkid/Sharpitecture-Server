@@ -1,12 +1,18 @@
-﻿using Sharpitecture.Chatting;
+﻿using Sharpitecture.API.Commands;
+using Sharpitecture.Chatting;
 using Sharpitecture.Database;
 using Sharpitecture.Entities;
+using Sharpitecture.Groups;
 using Sharpitecture.Levels;
+using Sharpitecture.Levels.Seeds;
+using Sharpitecture.Levels.IO;
 using Sharpitecture.Networking;
 using Sharpitecture.Tasks;
 using Sharpitecture.Utils.Concurrent;
 using Sharpitecture.Utils.Logging;
 using System.Text;
+using System.IO;
+using System.IO.Compression;
 
 namespace Sharpitecture
 {
@@ -15,10 +21,15 @@ namespace Sharpitecture
         private static TcpIPListener _listener { get; set; }
         public static readonly Encoding CP437 = Encoding.GetEncoding(437);
         internal static SqlDatabase PlayerDB;
-        public static VolatileList<Player> Players { get; internal set; }
         private static Scheduler _scheduler;
         public static Level MainLevel { get; private set; }
+
         public static VolatileList<Level> Levels { get; internal set; }
+        public static VolatileList<Group> Ranks { get; internal set; }
+        public static VolatileList<Player> Players { get; internal set; }
+        public static Group DefaultRank { get; internal set; }
+
+        public static bool UseSimpleGroups = true;
 
         public static void Start()
         {
@@ -32,13 +43,19 @@ namespace Sharpitecture
             Players = new VolatileList<Player>();
             Levels = new VolatileList<Level>();
 
+            Config.Load();
+
             Config.Initialise();
+            Group.Initialise();
+            Command.Initialise();
+            Seed.Initialise();
+            EntityHandler.Initialise();
 
             PlayerDB = new SqlDatabase("PlayerDB");
 
             MainLevel = new Level("main", 64, 64, 64);
             Levels.Add(MainLevel);
-            EntityHandler.Initialise();
+            NbtLoader.Save(MainLevel, false);
         }
 
         public static void QueueTask(Task task)

@@ -1,4 +1,5 @@
-﻿using Sharpitecture.Levels;
+﻿using Sharpitecture.Groups;
+using Sharpitecture.Levels;
 using Sharpitecture.Maths;
 using System.Collections.Generic;
 
@@ -17,6 +18,7 @@ namespace Sharpitecture.Entities
         protected Level _level;
         private List<byte> _VisibleIDs;
         protected byte _entityID;
+        public Group Group { get; set; }
 
         /// <summary>
         /// The name of the entity
@@ -31,7 +33,12 @@ namespace Sharpitecture.Entities
         /// <summary>
         /// The chat name of the entity
         /// </summary>
-        public virtual string ChatName { get { return _name; } }
+        public virtual string ChatName { get { return ChatColour + _name; } }
+
+        /// <summary>
+        /// The chat colour of the entity
+        /// </summary>
+        public virtual string ChatColour { get; set; } = "&f";
 
         /// <summary>
         /// The rotation of the entity in degrees

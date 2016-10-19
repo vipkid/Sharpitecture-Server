@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Sharpitecture.Utils.Concurrent
 {
@@ -46,6 +45,28 @@ namespace Sharpitecture.Utils.Concurrent
         {
             lock(_items)
                 return _items.FindAll(match);
+        }
+
+        public T FirstOrDefault(Func<T, bool> match)
+        {
+            lock(_items)
+                return _items.FirstOrDefault(match);
+        }
+
+        public bool Contains(T value, IEqualityComparer<T> comparer = null)
+        {
+            lock(_items)
+            {
+                if (comparer == null)
+                    return _items.Contains(value);
+                return _items.Contains(value, comparer);
+            }
+        }
+
+        public bool Any(Func<T, bool> p)
+        {
+            lock(_items)
+                return _items.Any(p);
         }
     }
 }

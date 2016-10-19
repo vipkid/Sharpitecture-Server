@@ -15,5 +15,10 @@
             this.A = a;
             this.name = name;
         }
+
+        public static implicit operator string(Colour code)
+        {
+            return "&" + code.code;
+        }
     }
 }
