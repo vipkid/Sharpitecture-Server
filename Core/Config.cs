@@ -12,13 +12,15 @@ namespace Sharpitecture
 
         public const string Name = "server-name",
                             MOTD = "server-motd",
-                            DefaultRank = "default-rank";
+                            DefaultRank = "default-rank",
+                            MainLevel = "main-level";
 
         public static void Initialise()
         {
             if (!_configurations.ContainsKey(Name)) Add<string>(Name, "Sharpitecture Server");
             if (!_configurations.ContainsKey(MOTD)) Add<string>(MOTD, "Work in progress....");
             if (!_configurations.ContainsKey(DefaultRank)) Add<string>(DefaultRank, "player");
+            if (!_configurations.ContainsKey(MainLevel)) Add<string>(MainLevel, "main");
             Save();
         }
 

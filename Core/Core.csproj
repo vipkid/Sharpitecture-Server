@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="API\Commands\Command.cs" />
     <Compile Include="API\Commands\DevCommands.cs" />
+    <Compile Include="API\Commands\MapCommands.cs" />
     <Compile Include="Chatting\Chat.cs" />
     <Compile Include="Chatting\Colour.cs" />
     <Compile Include="Chatting\ColourDefinitions.cs" />
@@ -59,6 +60,7 @@
     <Compile Include="Config.cs" />
     <Compile Include="Database\SqlDatabase.cs" />
     <Compile Include="API\Entity.API.cs" />
+    <Compile Include="Entities\ConsolePlayer.cs" />
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Entities\EntityHandler.cs" />
     <Compile Include="Entities\Player.cs" />

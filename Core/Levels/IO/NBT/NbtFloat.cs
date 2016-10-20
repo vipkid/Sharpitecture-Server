@@ -6,6 +6,92 @@ namespace Sharpitecture.Levels.IO.NBT
 {
     public class NbtFloat : INbtField
     {
+
+        public byte[] ByteArrayValue
+        {
+            get
+            {
+                byte[] val;
+                if (!Value.Convert(out val))
+                    throw new FormatException();
+                return val;
+            }
+        }
+
+        public byte ByteValue
+        {
+            get
+            {
+                byte val;
+                if (!Value.Convert(out val))
+                    throw new FormatException();
+                return val;
+            }
+        }
+
+        public double DoubleValue
+        {
+            get
+            {
+                double val;
+                if (!Value.Convert(out val))
+                    throw new FormatException();
+                return val;
+            }
+        }
+
+        public float FloatValue
+        {
+            get
+            {
+                float val;
+                if (!Value.Convert(out val))
+                    throw new FormatException();
+                return val;
+            }
+        }
+
+        public int IntValue
+        {
+            get
+            {
+                int val;
+                if (!Value.Convert(out val))
+                    throw new FormatException();
+                return val;
+            }
+        }
+
+        public long LongValue
+        {
+            get
+            {
+                long val;
+                if (!Value.Convert(out val))
+                    throw new FormatException();
+                return val;
+            }
+        }
+
+        public short ShortValue
+        {
+            get
+            {
+                short val;
+                if (!Value.Convert(out val))
+                    throw new FormatException();
+                return val;
+            }
+        }
+
+        public string StringValue
+        {
+            get
+            {
+                return Value.ToString();
+            }
+        }
+
         public string Name
         {
             get; set;

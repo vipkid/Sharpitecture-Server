@@ -34,6 +34,8 @@ namespace Sharpitecture.Entities
             conn.OnDataRead += HandleMessages;
         }
 
+        protected Player() { } //Psuedo Player
+
         private void HandleMessages(ByteBuffer buffer)
         {
             while (buffer.Position > 0)
@@ -73,10 +75,10 @@ namespace Sharpitecture.Entities
 
             Group = Group.FindPlayerRank(Name);
             ChatColour = Group.DefaultColor;
+            Server.Players.Add(this);
 
             SendMessage("&eYou are a " + Group.DefaultColor + Group.Name + "&e!");
-
-            Server.Players.Add(this);
+            Chat.MessageAll("&a+ " + ChatName + " &ejoined the game.");
         }
 
         private void HandleBlockchange(ByteBuffer buffer)
@@ -200,11 +202,11 @@ namespace Sharpitecture.Entities
             buffer.WriteByte(Opcodes.SpawnPlayer.id);
             buffer.WriteByte(255);
             buffer.WriteString(HoverName, Encoding.ASCII);
-            buffer.WriteShort(10);
-            buffer.WriteShort(10);
-            buffer.WriteShort(10);
-            buffer.WriteByte(Rotation.X);
-            buffer.WriteByte(Rotation.Y);
+            buffer.WriteShort(Level.Spawn.X);
+            buffer.WriteShort(Level.Spawn.Y);
+            buffer.WriteShort(Level.Spawn.Z);
+            buffer.WriteByte(Level.SpawnRot.X);
+            buffer.WriteByte(Level.SpawnRot.Y);
             SendRaw(buffer.Data);
         }
 

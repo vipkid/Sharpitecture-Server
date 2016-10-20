@@ -16,10 +16,20 @@ namespace Sharpitecture.Levels
         private readonly ushort _height;
         private Vector3S _spawnPosition;
         private string _name;
-        public byte[] Blocks { get; private set; }
-        public readonly byte[] UUID = new byte[16];
-        private byte[][] PhyBlocks;
+        public byte[] Blocks { get; internal set; }
+        public byte[] UUID = new byte[16];
+        public byte[][] PhyBlocks { get; internal set; }
         private BlockDefinitions _blockDefs;
+
+        public string Authors { get; internal set; }
+        public string SeedName { get; internal set; }
+
+        public long TimeCreated { get; internal set; }
+        public long LastAccessed { get; internal set; }
+        public long LastModified { get; internal set; }
+
+        public Vector3S Spawn;
+        public Vector3B SpawnRot;
 
         private string _loadingTitle;
         private string _loadingCaption;
@@ -92,6 +102,12 @@ namespace Sharpitecture.Levels
             }
         }
 
+        public Level()
+        {
+            TimeCreated = Extensions.GetUnixTimestamp();
+            UUID = Guid.NewGuid().ToByteArray();
+        }
+
         public Level(string name)
         {
             _name = name;
@@ -113,16 +129,21 @@ namespace Sharpitecture.Levels
             _height = (ushort)Y;
             Blocks = new byte[X * Y * Z];
             Initialize();
+            Authors = string.Empty;
 
             _spawnPosition = new Vector3S((short)(_width / 2), (short)(_height / 2 + 1), (short)(_depth / 2));
         }
 
         public void Initialize()
         {
+            TimeCreated = Extensions.GetUnixTimestamp();
+            UUID = Guid.NewGuid().ToByteArray();
+
             _blockDefs = new BlockDefinitions();
             _npcs = new List<Entity>();
 
             Seed.Seeds[0].Generate(this, CoreBlock.Grass, CoreBlock.Dirt);
+            SeedName = Seed.Seeds[0].Name;
         }
 
         public byte[] Serialize(bool customBlocks, bool blockDefinitions)
@@ -184,6 +205,11 @@ namespace Sharpitecture.Levels
         {
             if (!InRange(x, y, z)) return;
             Blocks[PosToInt(x, y, z)] = tile;
+        }
+
+        public static Level FindExact(string name)
+        {
+            return Server.Levels.FirstOrDefault(level => level.Name.CaselessEquals(name));
         }
     }
 }

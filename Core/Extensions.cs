@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.IO;
 using System.IO.Compression;
 
@@ -51,6 +52,11 @@ namespace Sharpitecture
                 return true;
             }
             return false;
+        }
+
+        public static long GetUnixTimestamp()
+        {
+            return (long)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds);
         }
     }
 }

@@ -52,10 +52,9 @@ namespace Sharpitecture
             EntityHandler.Initialise();
 
             PlayerDB = new SqlDatabase("PlayerDB");
-
-            MainLevel = new Level("main", 64, 64, 64);
+            
+            MainLevel = NbtLoader.Load(Config.Get<string>(Config.MainLevel)) ?? new Level("main", 64, 64, 64);
             Levels.Add(MainLevel);
-            NbtLoader.Save(MainLevel, false);
         }
 
         public static void QueueTask(Task task)
