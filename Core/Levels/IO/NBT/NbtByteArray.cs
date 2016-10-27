@@ -4,9 +4,9 @@ using System;
 
 namespace Sharpitecture.Levels.IO.NBT
 {
-    public class NbtByteArray : INbtField
+    public class NbtByteArray : NbtField
     {
-        public byte[] ByteArrayValue
+        public override byte[] ByteArrayValue
         {
             get
             {
@@ -14,73 +14,55 @@ namespace Sharpitecture.Levels.IO.NBT
             }
         }
 
-        public byte ByteValue
+        public override byte ByteValue
         {
             get
             {
-                byte val;
-                if (!Value.Convert(out val))
-                    throw new FormatException();
-                return val;
+                throw new FormatException();
             }
         }
 
-        public double DoubleValue
+        public override double DoubleValue
         {
             get
             {
-                double val;
-                if (!Value.Convert(out val))
-                    throw new FormatException();
-                return val;
+                throw new FormatException();
             }
         }
 
-        public float FloatValue
+        public override float FloatValue
         {
             get
             {
-                float val;
-                if (!Value.Convert(out val))
-                    throw new FormatException();
-                return val;
+                throw new FormatException();
             }
         }
 
-        public int IntValue
+        public override int IntValue
         {
             get
             {
-                int val;
-                if (!Value.Convert(out val))
-                    throw new FormatException();
-                return val;
+                throw new FormatException();
             }
         }
 
-        public long LongValue
+        public override long LongValue
         {
             get
             {
-                long val;
-                if (!Value.Convert(out val))
-                    throw new FormatException();
-                return val;
+                throw new FormatException();
             }
         }
 
-        public short ShortValue
+        public override short ShortValue
         {
             get
             {
-                short val;
-                if (!Value.Convert(out val))
-                    throw new FormatException();
-                return val;
+                throw new FormatException();
             }
         }
 
-        public string StringValue
+        public override string StringValue
         {
             get
             {
@@ -88,20 +70,15 @@ namespace Sharpitecture.Levels.IO.NBT
             }
         }
 
-        public string Name
-        {
-            get; set;
-        }
-
-        public int Size
+        public override int Size
         {
             get
             {
-                return 7 + ((byte[])Value).Length + Name.Length;
+                return 7 + ByteArrayValue.Length + Name.Length;
             }
         }
 
-        public byte TypeID
+        public override byte TypeID
         {
             get
             {
@@ -109,11 +86,9 @@ namespace Sharpitecture.Levels.IO.NBT
             }
         }
 
-        public object Value { get; set; }
-
-        public byte[] Serialize()
+        public override byte[] Serialize()
         {
-            byte[] arr = ((byte[])Value);
+            byte[] arr = ByteArrayValue;
             ByteBuffer buffer = new ByteBuffer(Size);
             buffer.WriteByte(TypeID);
             buffer.WriteShort((short)Name.Length);

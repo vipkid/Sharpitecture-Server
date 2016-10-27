@@ -11,47 +11,65 @@ namespace Sharpitecture.Networking
         public event DataReadEvent OnDataRead = null;
         #endregion
 
-        private Socket _socket;
+        /// <summary>
+        /// The socket bound to this connection object
+        /// </summary>
+        public Socket Socket { get; private set; }
+
+        /// <summary>
+        /// Whether a socket error has occurred
+        /// </summary>
+        public bool ErrorOccurred { get; private set; }
+
+        /// <summary>
+        /// The socket error code of the most recent error
+        /// </summary>
+        public int ErrorCode { get; private set; }
+
+        /// <summary>
+        /// The IP Address of the current connection
+        /// </summary>
+        public string IPAddress { get; private set; }
+
         private ByteBuffer _buffer;
         private byte[] _tmpBuffer = new byte[4192];
-        private readonly string _ipAddress;
-
-        private bool _errorOccurred = false;
-        private int _errorCode = 0;
-
-        public string IPAddress { get { return _ipAddress; } }
-        public bool ErrorOccurred { get { return _errorOccurred; } }
 
         public Connection(Socket sock)
         {
-            _socket = sock;
-            _ipAddress = sock.RemoteEndPoint.ToString().Split(':')[0];
-            _socket.BeginReceive(_tmpBuffer, 0, _tmpBuffer.Length, SocketFlags.None, ReadCallback, null);
+            Socket = sock;
+            IPAddress = sock.RemoteEndPoint.ToString().Split(':')[0];
+            Socket.BeginReceive(_tmpBuffer, 0, _tmpBuffer.Length, SocketFlags.None, ReadCallback, null);
             _buffer = new ByteBuffer(4192);
         }
 
-        public void ReadCallback(IAsyncResult result)
+        /// <summary>
+        /// Reads incoming messages
+        /// </summary>
+        void ReadCallback(IAsyncResult result)
         {
-            int length = _socket.EndReceive(result);
+            int length = Socket.EndReceive(result);
             _buffer.Write(_tmpBuffer, 0, length);
 
             if (OnDataRead == null)
                 throw new NotImplementedException();
 
             OnDataRead(_buffer);
-            _socket.BeginReceive(_tmpBuffer, 0, _tmpBuffer.Length, SocketFlags.None, ReadCallback, null);
+            Socket.BeginReceive(_tmpBuffer, 0, _tmpBuffer.Length, SocketFlags.None, ReadCallback, null);
         }
 
+        /// <summary>
+        /// Sends a raw message to the client
+        /// </summary>
         public void SendRaw(byte[] data)
         {
             try
             {
-                _socket.BeginSend(data, 0, data.Length, SocketFlags.None, null, null);
+                Socket.BeginSend(data, 0, data.Length, SocketFlags.None, null, null);
             }
             catch (SocketException ex)
             {
-                _errorOccurred = true;
-                _errorCode = ex.ErrorCode;
+                ErrorOccurred = true;
+                ErrorCode = ex.ErrorCode;
             }
         }
     }

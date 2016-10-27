@@ -2,21 +2,32 @@
 
 namespace Sharpitecture.API.Commands
 {
+    /// <summary>
+    /// A list of developer commands
+    /// Use of these commands is not recommended
+    /// </summary>
     public static class DevCommands
     {
-        public static Command TestCommand = new Command()
+        public static Command LoadPlugin = new Command()
         {
-            Name = "Test",
-            Shortcuts = new string[] { "t", "e", "s" },
-            Handler = TestCmd,
-            Permission = 50,
+            Name = "LoadPlugin",
+            ConsoleUsable = true,
+            Enabled = true,
+            IRCUsable = true,
+            Permission = 100,
+            Shortcuts = new[] { "lp" },
+            Handler = LoadPluginCommand
         };
 
-        public static void TestCmd(Player p, string parameters)
+        public static void LoadPluginCommand(Player player, string parameters)
         {
-            int pars = parameters.Split(' ').Length;
-            p.SendMessage(pars + " parameters parsed in the command.");
-            p.SendMessage("Parameters: " + parameters);
+            if (!Plugin.Load(parameters))
+            {
+                player.SendMessage("Could not find specified plugin");
+                return;
+            }
+
+            player.SendMessage("&ePlugin '&c" + parameters.ToLower() + "&e' loaded!");
         }
     }
 }

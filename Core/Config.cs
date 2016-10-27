@@ -1,4 +1,5 @@
 ﻿using Sharpitecture.Groups;
+using Sharpitecture.Utils.Config;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,71 +9,44 @@ namespace Sharpitecture
 {
     public static class Config
     {
-        private static Dictionary<string, string> _configurations;
+        [Config("Server", "name", "Sharpitecture Server", 
+            "The name of the server")]
+        public static string Name { get; set; }
 
-        public const string Name = "server-name",
-                            MOTD = "server-motd",
-                            DefaultRank = "default-rank",
-                            MainLevel = "main-level";
-
-        public static void Initialise()
-        {
-            if (!_configurations.ContainsKey(Name)) Add<string>(Name, "Sharpitecture Server");
-            if (!_configurations.ContainsKey(MOTD)) Add<string>(MOTD, "Work in progress....");
-            if (!_configurations.ContainsKey(DefaultRank)) Add<string>(DefaultRank, "player");
-            if (!_configurations.ContainsKey(MainLevel)) Add<string>(MainLevel, "main");
-            Save();
-        }
-
-        public static T Get<T>(string configName)
-        {
-            T value = default(T);
-
-            try
-            {
-                if (_configurations.ContainsKey(configName))
-                {
-                    var converter = TypeDescriptor.GetConverter(typeof(T));
-                    if (converter != null)
-                    {
-                        return (T)converter.ConvertFromString(_configurations[configName]);
-                    }
-                }
-            }
-            catch (NotSupportedException)
-            {
-                return value;
-            }
-
-            return value;
-        }
+        [Config("Server", "motd", "This server is under development", 
+            "The MOTD displayed on the client loading screen")]
+        public static string MOTD { get; set; }
         
-        public static bool Add<T>(string configName, string value = null)
-        {
-            if (TypeDescriptor.GetConverter(typeof(T)) == null)
-                return false;
+        [Config("Server", "default-rank", "guest",
+            "The default rank assigned to a player when they connect")]
+        public static string DefaultRank { get; set; }
 
-            _configurations.Add(configName, value);
-            return true;
-        }
+        [Config("Server", "main-level", "main",
+            "The default level a player joins when they connect")]
+        public static string MainLevel { get; set; }
 
+        /// <summary>
+        /// Loads the server's core configurations
+        /// </summary>
         public static void Load()
         {
-            _configurations = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            if (!Directory.Exists("properties")) { Directory.CreateDirectory("properties"); }
-
-            PropertyFile file = new PropertyFile("properties/server.properties");
-            file.LoadProperties(_configurations);
-            file.Save();
+            ConfigFile.LoadDefaultConfigs(typeof(Config));
+            ConfigFile.LoadConfigFile("properties/server.properties", ProcessLine);
+            ConfigFile.SaveConfigFile("properties/server.properties", typeof(Config));
         }
 
-        public static void Save()
+        /// <summary>
+        /// Processes a line within the configuration file
+        /// </summary>
+        static void ProcessLine(string key, string value)
         {
-            PropertyFile file = new PropertyFile("properties/server.properties");
-            file.LoadProperties();
-            foreach (string key in _configurations.Keys)
-                file.SetProperty(key, _configurations[key]);
-            file.Save();
+            switch (key.ToLower())
+            {
+                case "name": Name = value; break;
+                case "motd": MOTD = value; break;
+                case "default-rank": DefaultRank = value; break;
+                case "main-level": MainLevel = value; break;
+            }
         }
     }
 }

@@ -7,33 +7,70 @@ namespace Sharpitecture.Entities
 {
     public abstract partial class Entity
     {
-        protected Vector3S _position;
-        protected Vector3S _oldPosition;
-        protected Vector3S _posChange;
-        protected Vector3B _binaryRotation;
-        protected Vector3B _oldRotation;
-        protected Vector3B _rotChange;
-        private string _name;
-        private string _hoverName;
-        protected Level _level;
-        private List<byte> _VisibleIDs;
-        protected byte _entityID;
+        /// <summary>
+        /// The position of the entity
+        /// </summary>
+        public Vector3S Position;
+
+        /// <summary>
+        /// The old position of the entity
+        /// </summary>
+        public Vector3S OldPosition;
+
+        /// <summary>
+        /// The change in the entity's position
+        /// </summary>
+        public Vector3S PositionChange;
+
+        /// <summary>
+        /// The rotation of the entity
+        /// </summary>
+        public Vector3B Rotation;
+
+        /// <summary>
+        /// The old rotation of the entity
+        /// </summary>
+        public Vector3B OldRotation;
+
+        /// <summary>
+        /// The change in the entity's rotation
+        /// </summary>
+        public Vector3B RotationChange;
+
+        /// <summary>
+        /// The level the entity is on
+        /// </summary>
+        public Level Level { get; protected set; }
+
+        /// <summary>
+        /// The list of entity IDs visible by the client
+        /// </summary>
+        public List<byte> VisibleIDs { get; protected set; }
+
+        /// <summary>
+        /// The entity ID of this entity
+        /// </summary>
+        public byte EntityID { get; protected set; }
+
+        /// <summary>
+        /// The group the entity is within
+        /// </summary>
         public Group Group { get; set; }
 
         /// <summary>
         /// The name of the entity
         /// </summary>
-        public virtual string Name { get { return _name; } set { _name = value; } }
+        public string Name { get; protected set; }
 
         /// <summary>
         /// The hover name of the entity
         /// </summary>
-        public virtual string HoverName { get { return _hoverName; } set { _hoverName = value; } }
+        public virtual string HoverName { get; set; }
 
         /// <summary>
         /// The chat name of the entity
         /// </summary>
-        public virtual string ChatName { get { return ChatColour + _name; } }
+        public virtual string ChatName { get { return ChatColour + Name; } }
 
         /// <summary>
         /// The chat colour of the entity
@@ -41,62 +78,60 @@ namespace Sharpitecture.Entities
         public virtual string ChatColour { get; set; } = "&f";
 
         /// <summary>
-        /// The rotation of the entity in degrees
+        /// The decimal rotation of the entity
         /// </summary>
-        public Vector3F NormalRotation { get { return _binaryRotation.Scale(360F / 256F); } }
-
-        /// <summary>
-        /// The rotation of the entity in binary degrees
-        /// </summary>
-        public Vector3B Rotation { get { return _binaryRotation; } }
-
-        /// <summary>
-        /// The current level the entity is on
-        /// </summary>
-        public virtual Level Level { get { return _level; } }
-
-        /// <summary>
-        /// The ID bound to the entity given to other clients
-        /// </summary>
-        public byte EntityID { get { return _entityID; } }
-
-        /// <summary>
-        /// The list of visible Entity IDs to the entity
-        /// </summary>
-        public List<byte> VisibleIDs { get { return _VisibleIDs; } }
-
-        /// <summary>
-        /// The position of the entity
-        /// </summary>
-        public virtual Vector3S Position { get { return _position; } set { _position = value; } }
+        public Vector3F NormalRotation { get { return Rotation.Scale(360F / 256F); } }
 
         /// <summary>
         /// The block position of the entity
         /// </summary>
-        public virtual Vector3F BlockPosition { get { return _position.Scale(1 / 32f); } }
-
-
-        public Vector3S PositionChange { get { return _posChange; } }
-        public Vector3B RotationChange { get { return _rotChange; } }
+        public virtual Vector3F BlockPosition { get { return Position.Scale(1 / 32f); } }
 
         public Entity()
         {
-            _VisibleIDs = new List<byte>();
+            VisibleIDs = new List<byte>();
         }
 
+        /// <summary>
+        /// Sets the position and the rotation of the entity
+        /// </summary>
+        public virtual void SetPosRot(short X, short Y, short Z, byte RotX, byte RotY)
+        {
+            Position.X = X;
+            Position.Y = Y;
+            Position.Z = Z;
+            Rotation.X = RotX;
+            Rotation.Y = RotY;
+        }
+
+        /// <summary>
+        /// Sets the position of the entity
+        /// </summary>
         public virtual void SetPosition(short X, short Y, short Z)
         {
-            _position.X = X;
-            _position.Y = Y;
-            _position.Z = Z;
+            Position.X = X;
+            Position.Y = Y;
+            Position.Z = Z;
         }
 
+        /// <summary>
+        /// Sets the rotation of the entity
+        /// </summary>
+        public virtual void SetRotation(byte RotX, byte RotY)
+        {
+            Rotation.X = RotX;
+            Rotation.Y = RotY;
+        }
+
+        /// <summary>
+        /// Sends the entity to a different map
+        /// </summary>
         public virtual void SendToMap(Level level)
         {
             EntityHandler.DespawnAllEntities(this, true);
-            _level = level;
-            _entityID = level.GetFreeEntityID();
-            EntityHandler.SpawnAllEntities(this, _level, true);
+            Level = level;
+            EntityID = level.GetFreeEntityID();
+            EntityHandler.SpawnAllEntities(this, Level, true);
         }
     }
 }

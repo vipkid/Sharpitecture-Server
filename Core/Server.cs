@@ -1,5 +1,4 @@
 ﻿using Sharpitecture.API.Commands;
-using Sharpitecture.Chatting;
 using Sharpitecture.Database;
 using Sharpitecture.Entities;
 using Sharpitecture.Groups;
@@ -8,44 +7,81 @@ using Sharpitecture.Levels.Seeds;
 using Sharpitecture.Levels.IO;
 using Sharpitecture.Networking;
 using Sharpitecture.Tasks;
-using Sharpitecture.Utils.Concurrent;
 using Sharpitecture.Utils.Logging;
 using System.Text;
-using System.IO;
-using System.IO.Compression;
+using System.Collections.Generic;
 
 namespace Sharpitecture
 {
-    public static class Server
+    public static partial class Server
     {
-        private static TcpIPListener _listener { get; set; }
+        /// <summary>
+        /// The TcpListener for game client connections
+        /// </summary>
+        public static TcpIPListener Listener { get; private set; }
+
+        /// <summary>
+        /// The object used for CP437 Encoding
+        /// </summary>
         public static readonly Encoding CP437 = Encoding.GetEncoding(437);
+
+        /// <summary>
+        /// The player database
+        /// </summary>
         internal static SqlDatabase PlayerDB;
-        private static Scheduler _scheduler;
+
+        /// <summary>
+        /// The main task scheduler for the server
+        /// </summary>
+        public static Scheduler Scheduler { get; private set; }
+
+        /// <summary>
+        /// The main level of the server
+        /// </summary>
         public static Level MainLevel { get; private set; }
 
-        public static VolatileList<Level> Levels { get; internal set; }
-        public static VolatileList<Group> Ranks { get; internal set; }
-        public static VolatileList<Player> Players { get; internal set; }
+        /// <summary>
+        /// The list of loaded levels
+        /// </summary>
+        public static List<Level> Levels { get; internal set; }
+
+        /// <summary>
+        /// The list of ranks
+        /// </summary>
+        public static List<Group> Ranks { get; internal set; }
+
+        /// <summary>
+        /// The list of connected players
+        /// </summary>
+        public static List<Player> Players { get; internal set; }
+
+        /// <summary>
+        /// The default rank a player is set
+        /// </summary>
         public static Group DefaultRank { get; internal set; }
 
+        /// <summary>
+        /// Whether a simple group list should be used
+        /// </summary>
         public static bool UseSimpleGroups = true;
 
+        /// <summary>
+        /// Boots up the server
+        /// </summary>
         public static void Start()
         {
-            _listener = new TcpIPListener(25564);
-            _listener.OnSocketConnect += ProcessConnection;
-            _listener.Start();
+            Listener = new TcpIPListener(25564);
+            Listener.OnSocketConnect += ProcessConnection;
+            Listener.Start();
 
-            _scheduler = new Scheduler("Main.Scheduler");
-            _scheduler.Start();
+            Scheduler = new Scheduler("Main.Scheduler");
+            Scheduler.Start();
 
-            Players = new VolatileList<Player>();
-            Levels = new VolatileList<Level>();
+            Players = new List<Player>();
+            Levels = new List<Level>();
 
             Config.Load();
-
-            Config.Initialise();
+            
             Group.Initialise();
             Command.Initialise();
             Seed.Initialise();
@@ -53,15 +89,21 @@ namespace Sharpitecture
 
             PlayerDB = new SqlDatabase("PlayerDB");
             
-            MainLevel = NbtLoader.Load(Config.Get<string>(Config.MainLevel)) ?? new Level("main", 64, 64, 64);
+            MainLevel = NbtLoader.Load(Config.MainLevel) ?? new Level("main", 64, 64, 64);
             Levels.Add(MainLevel);
         }
 
+        /// <summary>
+        /// Queues a task to the scheduler
+        /// </summary>
         public static void QueueTask(Task task)
         {
-            _scheduler.Enqueue(task);
+            Scheduler.Enqueue(task);
         }
 
+        /// <summary>
+        /// Handles an incoming connection
+        /// </summary>
         static void ProcessConnection(SocketConnectEventArgs e)
         {
             string ip = e.Socket.RemoteEndPoint.ToString().Split(':')[0];

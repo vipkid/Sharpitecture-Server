@@ -5,19 +5,44 @@ namespace Sharpitecture.Tasks
 {
     public sealed class Task
     {
+        /// <summary>
+        /// Whether the task is recurring
+        /// </summary>
         public bool IsRecurring { get; set; }
-        public string Name { get; set; }
-        public int Timeout { get; set; }
-        public Action Handler { get; set; }
-        private DateTime _lastExecute = DateTime.MinValue;
 
-        public bool HasTimedOut { get { return (DateTime.UtcNow - _lastExecute).TotalMilliseconds > Timeout; } }
+        /// <summary>
+        /// The name of the task
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// The timeout of the task between each execution
+        /// </summary>
+        public int Timeout { get; set; }
+
+        /// <summary>
+        /// The handler of the task
+        /// </summary>
+        public Action Handler { get; set; }
+       
+        /// <summary>
+        /// The last time this task was executed
+        /// </summary>
+        public DateTime LastExecution { get; set; }
+
+        /// <summary>
+        /// Whether the task can execute again
+        /// </summary>
+        public bool HasTimedOut { get { return (DateTime.UtcNow - LastExecution).TotalMilliseconds > Timeout; } }
 
         public Task(Action handler)
         {
             Handler = handler;
         }
 
+        /// <summary>
+        /// Executes the task handler
+        /// </summary>
         public void Execute()
         {
             if (Handler == null)
@@ -28,7 +53,7 @@ namespace Sharpitecture.Tasks
             }
 
             Handler.Invoke();
-            _lastExecute = DateTime.UtcNow;
+            LastExecution = DateTime.UtcNow;
         }
     }
 }

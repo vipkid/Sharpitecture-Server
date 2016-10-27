@@ -8,7 +8,7 @@ namespace Sharpitecture.Networking
         /// <summary>
         /// The target socket connecting
         /// </summary>
-        public Socket Socket;
+        public Socket Socket { get; private set; }
 
         public SocketConnectEventArgs(Socket s)
         {

@@ -6,6 +6,9 @@ namespace Sharpitecture.Levels.IO
 {
     public class NbtLoader
     {
+        /// <summary>
+        /// Saves an NBT level
+        /// </summary>
         public static void Save(Level level, bool compress = true)
         {
             compress = true;
@@ -52,6 +55,9 @@ namespace Sharpitecture.Levels.IO
             file.Save();
         }
 
+        /// <summary>
+        /// Loads an NBT level
+        /// </summary>
         public static Level Load(string path, bool fullPath = false)
         {
             string lvlPath = fullPath ? path : "levels/nbt/" + path + ".cw";
@@ -68,9 +74,9 @@ namespace Sharpitecture.Levels.IO
 
             try {
                 level = new Level(levelFile["Name"]?.StringValue ?? Path.GetFileNameWithoutExtension(path),
-                levelFile["X"].ShortValue,
-                levelFile["Y"].ShortValue,
-                levelFile["Z"].ShortValue);
+                (ushort)levelFile["X"].ShortValue,
+                (ushort)levelFile["Y"].ShortValue,
+                (ushort)levelFile["Z"].ShortValue);
             }
             catch
             {

@@ -14,41 +14,52 @@ namespace Sharpitecture.Networking
         public event SocketConnectEvent OnSocketConnect = null;
         #endregion
 
-        private Socket _listener;
-        private readonly int _portNumber;
+        /// <summary>
+        /// The socket listening for connections
+        /// </summary>
+        public Socket Listener { get; private set; }
 
-        public int Port { get { return _portNumber; } }
+        /// <summary>
+        /// The port used by the listener
+        /// </summary>
+        public int Port { get; private set; }
 
         public TcpIPListener(int portNumber)
         {
-            _portNumber = portNumber;
+            Port = portNumber;
         }
 
+        /// <summary>
+        /// Starts listening for connections
+        /// </summary>
         public void Start()
         {
-            _listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Any, _portNumber);
+            Listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Any, Port);
 
             try
             {
-                _listener.Bind(localEndPoint);
-                _listener.Listen(int.MaxValue);
-                _listener.BeginAccept(AcceptConnection, null);
-                Logger.LogF("Created listening port on {0}", LogType.Info, _portNumber);
+                Listener.Bind(localEndPoint);
+                Listener.Listen(int.MaxValue);
+                Listener.BeginAccept(AcceptConnection, null);
+                Logger.LogF("Created listening port on {0}", LogType.Info, Port);
             }
             catch (SocketException)
             {
-                Logger.LogF("Failed to create a listening port on '{0}'", LogType.Error, _portNumber);
-                Logger.LogF("Please check if other applications are using this port.", LogType.Error, _portNumber);
+                Logger.LogF("Failed to create a listening port on '{0}'", LogType.Error, Port);
+                Logger.LogF("Please check if other applications are using this port.", LogType.Error, Port);
             }
         }
 
-        public void AcceptConnection(IAsyncResult result)
+        /// <summary>
+        /// Accepts an incoming connection
+        /// </summary>
+        void AcceptConnection(IAsyncResult result)
         {
             if (OnSocketConnect == null)
-                throw new Exception("Listener on port '" + _portNumber + "' lacks a socket connect event handler.");
-            OnSocketConnect(new SocketConnectEventArgs(_listener.EndAccept(result)));
-            _listener.BeginAccept(AcceptConnection, null);
+                throw new Exception("Listener on port '" + Port + "' lacks a socket connect event handler.");
+            OnSocketConnect(new SocketConnectEventArgs(Listener.EndAccept(result)));
+            Listener.BeginAccept(AcceptConnection, null);
         }
     }
 }

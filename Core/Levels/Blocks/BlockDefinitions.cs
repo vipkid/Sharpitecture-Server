@@ -7,83 +7,27 @@ namespace Sharpitecture.Levels.Blocks
 {
     public sealed class Block
     {
-        private string _name = "Unnamed";
-        private readonly byte _id;
-        private byte _nTexture;
-        private byte _eTexture;
-        private byte _sTexture;
-        private byte _wTexture;
-        private byte _bTexture;
-        private byte _tTexture;
-        private byte _speedModifier = 1;
-        private bool _transmitsLight;
-        private bool _glows;
-        private Solidity _solidity = Solidity.Solid;
-        private WalkSound _walkSound;
-        private RenderType _renderType;
-        private byte _fogDensity;
-        private Vector3B _fogColour;
-        private byte _fallback;
+        public string Name { get; private set; }
+        public byte ID { get; private set; }
+        public byte NorthTexture { get; private set; }
+        public byte EastTexture { get; private set; }
+        public byte SouthTexture { get; private set; }
+        public byte WestTexture { get; private set; }
+        public byte TopTexture { get; private set; }
+        public byte BottomTexture { get; private set; }
+        public byte SpeedModifier { get; private set; }
+        public byte TransmitsLight { get; private set; }
+        public byte Glows { get; private set; }
+        public Solidity CollisionType { get; private set; }
+        public WalkSound WalkSound { get; private set; }
+        public RenderType RenderType { get; private set; }
+        public byte FogDensity { get; private set; }
+        public byte Fallback { get; private set; }
+        public Vector3B MinBB;
+        public Vector3B MaxBB;
+        public Vector3B FogColour;
 
-        public string Name { get { return _name; } }
-        public byte ID { get { return _id; } }
-        public byte Fallback { get { return _fallback; } }
-
-        public void UpdateTexture(Level level, byte north, byte east, byte south, byte west, byte top, byte bottom)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SetName(Level level, string name)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SetBoundingBox(Level level, Vector3B min, Vector3B max)
-        {
-            SetBoundingBox(level, min.X, min.Y, min.Z, max.X, max.Y, max.Z);
-        }
-
-        public void SetBoundingBox(Level level, byte x1, byte y1, byte z1, byte x2, byte y2, byte z2)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SetSpeedModifier(float speed)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SetTransparent(bool transmitsLight)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SetRenderType(RenderType renderType)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SetFullBrightness(bool fullBright)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Sets the height of the block
-        /// </summary>
-        [Obsolete("BlockDefinitionsExt specifies a bounding box field. Use Block.SetBoundingBox")]
-        public void SetHeight(byte height)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SetStepSound(WalkSound sound)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static byte GetFallback(byte id)
+        public static byte GetCustomBlocksFallback(byte id)
         {
             switch (id)
             {
@@ -110,11 +54,53 @@ namespace Sharpitecture.Levels.Blocks
 
     public sealed class BlockDefinitions
     {
-        private List<Block> _definitions;
+        /// <summary>
+        /// The list of block definitions
+        /// </summary>
+        private List<Block> Definitions { get; set; }
+
+        /// <summary>
+        /// Gets a block by its ID
+        /// </summary>
+        public Block this[int index]
+        {
+            get
+            {
+                return Definitions.FirstOrDefault(block => block.ID == index);
+            }
+        }
 
         public BlockDefinitions()
         {
-            _definitions = new List<Block>();
+            Definitions = new List<Block>();
+            Definitions.Capacity = byte.MaxValue - 66;
+        }
+
+        /// <summary>
+        /// Adds a block definition
+        /// </summary>
+        public bool AddDefinition(Level level, Block block)
+        {
+            if (Definitions.Any(b => block.ID == b.ID))
+                return false;
+            Definitions.Add(block);
+
+            //Update the definitions to all players here
+            return true;
+        }
+
+        /// <summary>
+        /// Removes a block definition
+        /// </summary>
+        public bool RemoveDefinition(byte ID)
+        {
+            Block block = Definitions.FirstOrDefault(b => b.ID == ID);
+            if (block == null)
+                return false;
+            Definitions.Remove(block);
+
+            //Remove the definitions to all players here
+            return true;
         }
 
         /// <summary>
@@ -122,14 +108,14 @@ namespace Sharpitecture.Levels.Blocks
         /// </summary>
         public byte GetFallback(byte id, bool customblocks, bool blockDefinitions)
         {
-            if ((blockDefinitions && id > 65) || _definitions.Any(b => b.ID == id))
+            if ((blockDefinitions && id > 65) || Definitions.Any(b => b.ID == id))
                 return id;
 
             if (id <= 49 || (customblocks && id <= 65))
                 return id;
 
-            Block block = _definitions.Find(b => b.ID == id);
-            if (block.Fallback > 49 && !customblocks) return Block.GetFallback(block.Fallback);
+            Block block = Definitions.Find(b => b.ID == id);
+            if (block.Fallback > 49 && !customblocks) return Block.GetCustomBlocksFallback(block.Fallback);
             return block.Fallback;
         }
     }

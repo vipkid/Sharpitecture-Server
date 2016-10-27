@@ -54,7 +54,7 @@
         public const byte MossyCobblestone = 48;
         public const byte Obsidian = 49;
         #endregion
-        #region ==CUSTOM BLOCKS V1==
+        #region ==CUSTOMBLOCKS V1==
         public const byte CobblestoneSlab = 50;
         public const byte Rope = 51;
         public const byte Sandstone = 52;

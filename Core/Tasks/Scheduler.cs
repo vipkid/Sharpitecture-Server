@@ -7,38 +7,60 @@ namespace Sharpitecture.Tasks
 {
     public class Scheduler
     {
-        private Thread _mainThread;
-        private List<Task> _tasks;
-        private bool _stopping = false;
-        private string _name;
+        /// <summary>
+        /// The list of tasks executed by the scheduler
+        /// </summary>
+        public List<Task> Tasks { get; private set; }
 
-        public string Name { get { return _name; } }
+        /// <summary>
+        /// Returns whether the scheduler is in the process of stopping
+        /// </summary>
+        public bool IsStopping { get; private set; }
+
+        /// <summary>
+        /// The name of the scheduler
+        /// </summary>
+        public string Name { get; private set; }
+
+        private Thread _mainThread;
 
         public Scheduler(string name)
         {
-            _tasks = new List<Task>();
-            _name = name;
+            Tasks = new List<Task>();
+            Name = name;
             _mainThread = new Thread(MainLoop);
         }
 
+        /// <summary>
+        /// Starts the scheduler
+        /// </summary>
         public void Start()
         {
             _mainThread.Start();
         }
 
+        /// <summary>
+        /// Stops the execution of tasks
+        /// </summary>
         public void Stop()
         {
-            _stopping = true;
+            IsStopping = true;
             _mainThread.Join();
-            Logger.LogF("Scheduler '{0}' stopped.", LogType.Info, _name);
+            Logger.LogF("Scheduler '{0}' stopped.", LogType.Info, Name);
         }
 
+        /// <summary>
+        /// Queues a task to the scheduler
+        /// </summary>
         public void Enqueue(Task task)
         {
-            lock(_tasks)
-                _tasks.Add(task);
+            lock(Tasks)
+                Tasks.Add(task);
         }
 
+        /// <summary>
+        /// Queues an anonymous task to the scheduler
+        /// </summary>
         public void Enqueue(Action action)
         {
             Task task = new Task(action)
@@ -49,24 +71,24 @@ namespace Sharpitecture.Tasks
                 Timeout = 0
             };
 
-            lock (_tasks)
-                _tasks.Add(task);
+            lock (Tasks)
+                Tasks.Add(task);
         }
 
         void MainLoop()
         {
-            while (!_stopping)
+            while (!IsStopping)
             {
-                if (_tasks.Count <= 0) { Thread.Sleep(10); continue; }
+                if (Tasks.Count <= 0) { Thread.Sleep(10); continue; }
 
-                lock (_tasks)
+                lock (Tasks)
                 {
                     Task task;
                     List<Task> toRemove = new List<Task>();
 
-                    for (int i = 0; i < _tasks.Count; i++)
+                    for (int i = 0; i < Tasks.Count; i++)
                     {
-                        task = _tasks[i];
+                        task = Tasks[i];
 
                         if (!task.IsRecurring)
                             toRemove.Add(task);
@@ -76,13 +98,13 @@ namespace Sharpitecture.Tasks
                     }
 
                     foreach (Task _task in toRemove)
-                        _tasks.Remove(_task);
+                        Tasks.Remove(_task);
                 }
 
                 Thread.Sleep(1);
             }
 
-            Logger.LogF("Stop requested on '{0}', aborting thread...", LogType.Info, _name);
+            Logger.LogF("Stop requested on '{0}', aborting thread...", LogType.Info, Name);
         }
     }
 }

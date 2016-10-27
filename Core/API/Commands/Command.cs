@@ -43,15 +43,14 @@ namespace Sharpitecture.API.Commands
         /// </summary>
         public Action<Player, string> Handler;
 
-        public static List<Command> Commands
-        {
-            get; private set;
-        }
+        /// <summary>
+        /// The list of commands supported by the server
+        /// </summary>
+        public static List<Command> Commands { get; private set; }
 
         public static void Initialise()
         {
             Commands = new List<Command>();
-            //Commands.Add(DevCommands.TestCommand);
 
             Type[] types = Assembly.GetExecutingAssembly().GetTypes();
 
@@ -72,7 +71,42 @@ namespace Sharpitecture.API.Commands
             }
         }
 
-        public static Command Find(string cmd) 
-            => Commands.FirstOrDefault(cd => cd.Name.CaselessEquals(cmd) || cd.Shortcuts.Any(sh => sh.CaselessEquals(cmd)));
+        /// <summary>
+        /// Finds a command with the given name
+        /// </summary>
+        public static Command Find(string cmd)
+        { 
+            return Commands.FirstOrDefault(cd => cd.Name.CaselessEquals(cmd) || cd.Shortcuts.Any(sh => sh.CaselessEquals(cmd)));
+        }
+
+        /// <summary>
+        /// Checks whether a player is found
+        /// </summary>
+        public static bool CheckIfPlayerExists(Player player, string target, out Player found)
+        {
+            found = Player.Find(target);
+
+            if (found == null)
+            {
+                player.SendMessage("Could not find specified player.");
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Whether the player can execute an action on the target
+        /// </summary>
+        public static bool EqualOrGreaterPerms(Player player, Player target)
+        {
+            if (player.Group.PermissionLevel <= target.Group.PermissionLevel)
+            {
+                player.SendMessage("Cannot perform action on player with greater or equal rank.");
+                return false;
+            }
+
+            return true;
+        }
     }
 }

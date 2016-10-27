@@ -7,7 +7,7 @@ namespace Sharpitecture.Chatting
 {
     public class ColourDefinitions
     {
-        public const string ReservedCharacters = "0123456789abcdef";
+        public const string ReservedCharacters = "0123456789abcdef ";
 
         private static List<Colour> _colours = new List<Colour>()
         {
@@ -29,8 +29,14 @@ namespace Sharpitecture.Chatting
             c.White
         };
 
+        /// <summary>
+        /// Returns whether a colour code is bound to a character
+        /// </summary>
         public static bool IsValidColourCode(char c) => _colours.Any(col => col.code == c);
 
+        /// <summary>
+        /// Finds the specified colour associated with the code
+        /// </summary>
         public static Colour FindColour(string col)
         {
             if (col.StartsWith("&") && col.Length == 2)

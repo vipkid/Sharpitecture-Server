@@ -54,6 +54,9 @@ namespace Sharpitecture
             return false;
         }
 
+        /// <summary>
+        /// Gets a Unix Timestamp
+        /// </summary>
         public static long GetUnixTimestamp()
         {
             return (long)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds);

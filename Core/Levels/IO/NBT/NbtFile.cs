@@ -18,7 +18,7 @@ namespace Sharpitecture.Levels.IO.NBT
             Root = new NbtCompound();
         }
 
-        public INbtField this[string index]
+        public NbtField this[string index]
         {
             get
             {
@@ -26,7 +26,7 @@ namespace Sharpitecture.Levels.IO.NBT
             }
         }
 
-        public void Add(INbtField field)
+        public void Add(NbtField field)
         {
             Root.AddField(field);
         }

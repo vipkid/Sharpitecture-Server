@@ -6,7 +6,7 @@ namespace Sharpitecture.Chatting
     public static class LineWrapper
     {
         public const int MAX_TEXT_LENGTH = 64;
-
+        
         public static IEnumerable<string> WrapLines(string input)
         {
             while (input.Contains("  ")) input = input.Replace("  ", " ");
@@ -33,7 +33,7 @@ namespace Sharpitecture.Chatting
                     }
                 }
 
-                if (curPart.Length > 60) tempLine += " ";
+                if (curPart.Length > MAX_TEXT_LENGTH - 4) tempLine += " ";
                 if (tempLine.Length + curPart.Length + 1 > MAX_TEXT_LENGTH)
                 {
                     yield return tempLine.Trim(' ');
@@ -41,9 +41,9 @@ namespace Sharpitecture.Chatting
                 }
 
                 bool skipAppend = false;
-                while (curPart.Length > 64)
+                while (curPart.Length > MAX_TEXT_LENGTH)
                 {
-                    int remaining = 64 - tempLine.Length;
+                    int remaining = MAX_TEXT_LENGTH - tempLine.Length;
                     tempLine += curPart.Substring(0, remaining);
                     curPart = curPart.Remove(0, remaining);
                     yield return tempLine.Trim(' ');
@@ -53,7 +53,7 @@ namespace Sharpitecture.Chatting
 
                 if (skipAppend)
                 {
-                    if (tempLine.Length == 64)
+                    if (tempLine.Length == MAX_TEXT_LENGTH)
                     {
                         yield return tempLine.Trim(' ');
                         tempLine = "> &" + startCol.code;

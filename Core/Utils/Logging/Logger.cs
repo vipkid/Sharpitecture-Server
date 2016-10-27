@@ -1,21 +1,40 @@
-﻿using Sharpitecture.Utils.Concurrent;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace Sharpitecture.Utils.Logging
 {
     public static class Logger
     {
-        private static VolatileQueue<Log> PendingLogs = new VolatileQueue<Log>();
-        private static bool _initalised = false;
-        private static Thread _logThread;
+        /// <summary>
+        /// The pending logs waiting to be written
+        /// </summary>
+        public static Queue<Log> PendingLogs { get; set; }
 
+        /// <summary>
+        /// Whether the logger has started
+        /// </summary>
+        public static bool Initalised { get; private set; }
+
+        /// <summary>
+        /// The thread handling the logs
+        /// </summary>
+        public static Thread LogThread { get; set; }
+
+        private static object lockObject = new object();
+
+        /// <summary>
+        /// Logs a regular message
+        /// </summary>
         public static void Log(string message, LogType type)
         {
             Log log = new Log(message, type, DateTime.Now);
             PendingLogs.Enqueue(log);
         }
 
+        /// <summary>
+        /// Logs a formatted message
+        /// </summary>
         public static void LogF(string message, LogType type, params object[] args)
         {
             try
@@ -29,28 +48,29 @@ namespace Sharpitecture.Utils.Logging
             }
         }
 
+        /// <summary>
+        /// Initialises the logger
+        /// </summary>
         public static void Initalise()
         {
-            if (_initalised) return;
-            _logThread = new Thread(MainLoop) { Name = "Sharpitecture.Logger", IsBackground = true };
-            _logThread.Start();
+            if (Initalised) return;
+            PendingLogs = new Queue<Log>();
+            LogThread = new Thread(MainLoop) { Name = "Sharpitecture.Logger", IsBackground = true };
+            LogThread.Start();
             Log("Logger successfully initialised", LogType.Debug);
         }
 
         static void MainLoop()
         {
-            int retries;
 
             while (true)
             {
-                retries = 0;
                 Log log;
-                while (!PendingLogs.IsEmpty)
+                while (PendingLogs.Count > 0)
                 {
-                    if (!PendingLogs.TryDequeue(out log))
-                        retries++;
-                    else
+                    lock (lockObject)
                     {
+                        log = PendingLogs.Dequeue();
                         if (!Starter.GuiMode)
                         {
                             if (log.type == LogType.Debug)
@@ -68,13 +88,8 @@ namespace Sharpitecture.Utils.Logging
                             throw new NotImplementedException();
                         }
                     }
-
-                    if (retries > 5)
-                    {
-                        Console.WriteLine("Failed to append log.");
-                        break;
-                    }
                 }
+
                 Thread.Sleep(10);
             }
         }

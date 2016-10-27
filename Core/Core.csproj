@@ -51,7 +51,11 @@
   <ItemGroup>
     <Compile Include="API\Commands\Command.cs" />
     <Compile Include="API\Commands\DevCommands.cs" />
+    <Compile Include="API\Commands\InfoCommands.cs" />
     <Compile Include="API\Commands\MapCommands.cs" />
+    <Compile Include="API\Commands\ModCommands.cs" />
+    <Compile Include="API\Plugins\Plugin.cs" />
+    <Compile Include="API\Server.API.cs" />
     <Compile Include="Chatting\Chat.cs" />
     <Compile Include="Chatting\Colour.cs" />
     <Compile Include="Chatting\ColourDefinitions.cs" />
@@ -59,11 +63,11 @@
     <Compile Include="Chatting\LineWrapper.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Database\SqlDatabase.cs" />
-    <Compile Include="API\Entity.API.cs" />
-    <Compile Include="Entities\ConsolePlayer.cs" />
+    <Compile Include="API\Player.API.cs" />
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Entities\EntityHandler.cs" />
-    <Compile Include="Entities\Player.cs" />
+    <Compile Include="Entities\Player\Player.cs" />
+    <Compile Include="Entities\Player\Player.Networking.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Groups\Group.cs" />
     <Compile Include="Groups\GroupList.cs" />
@@ -76,7 +80,7 @@
     <Compile Include="Levels\IO\DatLoader.cs" />
     <Compile Include="Levels\IO\LvlLoader.cs" />
     <Compile Include="Levels\IO\NbtLoader.cs" />
-    <Compile Include="Levels\IO\NBT\INbtField.cs" />
+    <Compile Include="Levels\IO\NBT\NbtField.cs" />
     <Compile Include="Levels\IO\NBT\NbtByte.cs" />
     <Compile Include="Levels\IO\NBT\NbtByteArray.cs" />
     <Compile Include="Levels\IO\NBT\NbtCompound.cs" />
@@ -102,12 +106,11 @@
     <Compile Include="Starter.cs" />
     <Compile Include="Tasks\Scheduler.cs" />
     <Compile Include="Tasks\Task.cs" />
-    <Compile Include="Utils\Concurrent\VolatileList.cs" />
-    <Compile Include="Utils\Concurrent\VolatileQueue.cs" />
+    <Compile Include="Utils\Config\ConfigAttributes.cs" />
+    <Compile Include="Utils\Config\ConfigFile.cs" />
     <Compile Include="Utils\Logging\Log.cs" />
     <Compile Include="Utils\Logging\Logger.cs" />
     <Compile Include="Utils\Logging\LogType.cs" />
-    <Compile Include="Utils\PropertyFile.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

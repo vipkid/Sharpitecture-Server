@@ -5,6 +5,9 @@ using Sharpitecture.Levels.IO;
 
 namespace Sharpitecture.API.Commands
 {
+    /// <summary>
+    /// A list of commands which can edit map properties
+    /// </summary>
     public static class MapCommands
     {
         public static Command SetSpawn = new Command()
@@ -50,11 +53,6 @@ namespace Sharpitecture.API.Commands
 
             if (!string.IsNullOrEmpty(parameters))
                 level = Level.FindExact(parameters);
-            else if (player is ConsolePlayer)
-            {
-                player.SendMessage("You must specify a level if you're not in-game");
-                return;
-            }
 
             if (level == null)
             {

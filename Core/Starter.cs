@@ -1,15 +1,15 @@
-﻿using Sharpitecture.Utils.Logging;
+﻿using Sharpitecture.Utils.Config;
+using Sharpitecture.Utils.Logging;
 using System.IO;
 
 namespace Sharpitecture
 {
     public static class Starter
     {
-        private static bool _guiMode;
-        //private static Server _server;
-
-        public static bool GuiMode { get { return _guiMode; } set { _guiMode = value; } }
-        //public static Server Server { get { return _server; } }
+        /// <summary>
+        /// Whether the server starts with a graphical user interface
+        /// </summary>
+        public static bool GuiMode { get; set; }
 
         public static void Main()
         {
@@ -24,24 +24,30 @@ namespace Sharpitecture
                     writer.Close();
                 }
 
-                _guiMode = false;
+                GuiMode = false;
                 StartServer();
                 return;
             }
 
             using (StreamReader reader = new StreamReader(File.OpenRead("launcher.properties")))
             {
-                string line;
+                string line, key, value;
                 while (!reader.EndOfStream)
                 {
-                    if ((line = reader.ReadLine()).StartsWith("#") || line.IndexOf('=') == -1) continue;
-                    string[] parts = line.Split(new char[] { '=' }, 2);
-
-                    string key = parts[0];
-                    string value = parts[1];
-
-                    if (key.CaselessEquals("gui-mode") && !bool.TryParse(value, out _guiMode))
-                        _guiMode = false;
+                    if (ConfigFile.ParseLine(line = reader.ReadLine(), out key, out value))
+                    {
+                        if (key.CaselessEquals("gui-mode"))
+                        {
+                            try
+                            {
+                                GuiMode = bool.Parse(value);
+                            }
+                            catch
+                            {
+                                GuiMode = false;
+                            }
+                        }
+                    }
                 }
 
                 reader.Close();
@@ -50,11 +56,13 @@ namespace Sharpitecture
             StartServer();
         }
 
-        private static void StartServer()
+        /// <summary>
+        /// Starts the server
+        /// </summary>
+        static void StartServer()
         {
             Logger.Initalise();
             Server.Start();
-            //_server = new Server();
         }
     }
 }

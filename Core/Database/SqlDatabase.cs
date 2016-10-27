@@ -7,23 +7,32 @@ namespace Sharpitecture.Database
 {
     public class SqlDatabase
     {
-        private readonly string _name;
+        /// <summary>
+        /// The name of the database
+        /// </summary>
+        public string Name { get; private set; }
 
-        public string Name { get { return _name; } }
-        public string ConnString { get { return "Data Source=" + _name + ".db;"; } }
+        /// <summary>
+        /// The connection string of the database
+        /// </summary>
+        public string ConnString { get { return "Data Source=" + Name + ".db;"; } }
 
         public SqlDatabase(string name)
         {
-            _name = name;
+            Name = name;
             if (!Directory.Exists("database")) Directory.CreateDirectory("database");
 
-            if (string.IsNullOrEmpty(_name) || _name.IndexOfAny(Path.GetInvalidFileNameChars()) != -1)
+            if (string.IsNullOrEmpty(Name) || Name.IndexOfAny(Path.GetInvalidFileNameChars()) != -1)
                 throw new FormatException("Database name is null or contains illegal characters");
 
-            if (!File.Exists(string.Format("database/{0}.db", _name)))
-                File.Create(string.Format("database/{0}.db", _name)).Dispose();
+            if (!File.Exists(string.Format("database/{0}.db", Name)))
+                File.Create(string.Format("database/{0}.db", Name)).Dispose();
         }
 
+        /// <summary>
+        /// Executes an SQLite command
+        /// </summary>
+        /// <param name="command"></param>
         public void ExecuteQuery(string command)
         {
             SQLiteConnection conn = new SQLiteConnection(ConnString);

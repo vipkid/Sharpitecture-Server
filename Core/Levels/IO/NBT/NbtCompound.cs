@@ -6,130 +6,64 @@ using System.Text;
 
 namespace Sharpitecture.Levels.IO.NBT
 {
-    public class NbtCompound : INbtField
+    public class NbtCompound : NbtField
     {
+        public override byte TypeID { get { return 10; } }
 
-        public byte[] ByteArrayValue
+        /// <summary>
+        /// The list of fields within the NbtCompound
+        /// </summary>
+        public List<NbtField> Fields { get; private set; } = new List<NbtField>();
+
+        public override int Size
         {
             get
             {
-                byte[] val;
-                if (!Value.Convert(out val))
-                    throw new FormatException();
-                return val;
+                return Fields.Sum(f => f.Size) + 4 + Name.Length;
             }
         }
 
-        public byte ByteValue
-        {
-            get
-            {
-                byte val;
-                if (!Value.Convert(out val))
-                    throw new FormatException();
-                return val;
-            }
-        }
-
-        public double DoubleValue
-        {
-            get
-            {
-                double val;
-                if (!Value.Convert(out val))
-                    throw new FormatException();
-                return val;
-            }
-        }
-
-        public float FloatValue
-        {
-            get
-            {
-                float val;
-                if (!Value.Convert(out val))
-                    throw new FormatException();
-                return val;
-            }
-        }
-
-        public int IntValue
-        {
-            get
-            {
-                int val;
-                if (!Value.Convert(out val))
-                    throw new FormatException();
-                return val;
-            }
-        }
-
-        public long LongValue
-        {
-            get
-            {
-                long val;
-                if (!Value.Convert(out val))
-                    throw new FormatException();
-                return val;
-            }
-        }
-
-        public short ShortValue
-        {
-            get
-            {
-                short val;
-                if (!Value.Convert(out val))
-                    throw new FormatException();
-                return val;
-            }
-        }
-
-        public string StringValue
-        {
-            get
-            {
-                return Value.ToString();
-            }
-        }
-
-        public byte TypeID
-        {
-            get
-            {
-                return 10;
-            }
-        }
-
-        public string Name { get; set; }
-        private List<INbtField> _fields = new List<INbtField>();
-        public object Value { get; set; }
-
-        public int Size
-        {
-            get
-            {
-                return _fields.Sum(f => f.Size) + 4 + Name.Length;
-            }
-        }
-
-        public byte[] Serialize()
+        public override byte[] Serialize()
         {
             ByteBuffer buffer = new ByteBuffer(Size);
             buffer.WriteByte(TypeID);
             buffer.WriteShort((short)Name.Length);
             buffer.WriteString(Name, Encoding.ASCII, Name.Length);
 
-            foreach (INbtField field in _fields)
+            foreach (NbtField field in Fields)
                 buffer.Write(field.Serialize(), 0, field.Size);
 
             buffer.WriteByte(0);
             return buffer.Data;
         }
 
-        public void AddField(INbtField field) => _fields.Add(field);
+        /// <summary>
+        /// Adds a field to the NbtCompound
+        /// </summary>
+        public void AddField(NbtField field)
+        {
+            if (Fields.Any(f => f.Name.CaselessEquals(field.Name)))
+                throw new Exception("Field with name '" + field.Name + "' already exists!");
+            Fields.Add(field);
+        }
 
-        public INbtField GetField(string fieldName) => _fields.FirstOrDefault(field => field.Name.CaselessEquals(fieldName));
+        /// <summary>
+        /// Removes a field from the NbtCompound
+        /// </summary>
+        public void RemoveField(string fieldName)
+        {
+            NbtField field = GetField(fieldName);
+            if (field == null)
+                return;
+            Fields.Remove(field);
+        }
+
+        /// <summary>
+        /// Gets a field with the specified name
+        /// </summary>
+        public NbtField GetField(string fieldName)
+        {
+            return Fields.FirstOrDefault(field => field.Name.CaselessEquals(fieldName));
+        }
     }
 }
