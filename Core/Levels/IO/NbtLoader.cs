@@ -104,7 +104,7 @@ namespace Sharpitecture.Levels.IO
             level.TimeCreated = levelFile["TimeCreated"]?.LongValue ?? Extensions.GetUnixTimestamp();
             level.LastModified = levelFile["LastModified"]?.LongValue ?? Extensions.GetUnixTimestamp();
             level.LastAccessed = Extensions.GetUnixTimestamp();
-            
+
             try
             {
                 NbtCompound MapGen = (NbtCompound)levelFile["MapGeneration"];

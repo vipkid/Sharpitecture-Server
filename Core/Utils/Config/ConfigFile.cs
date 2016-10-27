@@ -32,7 +32,12 @@ namespace Sharpitecture.Utils.Config
                 {
                     if (ParseLine(reader, out key, out value))
                     {
-                        processor(key, value);
+                        try {
+                            processor(key, value);
+                        } catch {
+                            Logger.LogF("Hit error at key={0} and value={1}", LogType.Error, key, value);
+                            continue;
+                        }
                     }
                 }
 

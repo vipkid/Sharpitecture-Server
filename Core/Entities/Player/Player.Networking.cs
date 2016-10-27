@@ -58,7 +58,6 @@ namespace Sharpitecture.Entities
         /// <summary>
         /// Handles a login message
         /// </summary>
-        /// <param name="buffer"></param>
         private void HandleLoginMessage(ByteBuffer buffer)
         {
             byte protocolVersion = buffer.ReadByte();
@@ -83,7 +82,6 @@ namespace Sharpitecture.Entities
         /// <summary>
         /// Handles a blockchange packet
         /// </summary>
-        /// <param name="buffer"></param>
         private void HandleBlockchange(ByteBuffer buffer)
         {
             short x = buffer.ReadShort();
@@ -102,7 +100,6 @@ namespace Sharpitecture.Entities
         /// <summary>
         /// Handles a position change packet
         /// </summary>
-        /// <param name="buffer"></param>
         private void HandlePositionUpdate(ByteBuffer buffer)
         {
             byte heldBlock = buffer.ReadByte();
@@ -123,7 +120,6 @@ namespace Sharpitecture.Entities
         /// <summary>
         /// Handles a chat message packet
         /// </summary>
-        /// <param name="buffer"></param>
         private void HandleChatMessage(ByteBuffer buffer)
         {
             byte unused = buffer.ReadByte();

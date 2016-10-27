@@ -10,6 +10,7 @@ using Sharpitecture.Tasks;
 using Sharpitecture.Utils.Logging;
 using System.Text;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 
 namespace Sharpitecture
 {
@@ -66,21 +67,28 @@ namespace Sharpitecture
         public static bool UseSimpleGroups = true;
 
         /// <summary>
+        /// Base62 key required for clients to join the server
+        /// </summary>
+        public static string Salt { get; private set; }
+
+        /// <summary>
         /// Boots up the server
         /// </summary>
         public static void Start()
         {
-            Listener = new TcpIPListener(25564);
+            Config.Load();
+
+            Listener = new TcpIPListener(Config.Port);
             Listener.OnSocketConnect += ProcessConnection;
             Listener.Start();
+
+            GenerateSalt();
 
             Scheduler = new Scheduler("Main.Scheduler");
             Scheduler.Start();
 
             Players = new List<Player>();
             Levels = new List<Level>();
-
-            Config.Load();
             
             Group.Initialise();
             Command.Initialise();
@@ -91,6 +99,8 @@ namespace Sharpitecture
             
             MainLevel = NbtLoader.Load(Config.MainLevel) ?? new Level("main", 64, 64, 64);
             Levels.Add(MainLevel);
+
+            Heartbeat.Beat();
         }
 
         /// <summary>
@@ -109,6 +119,26 @@ namespace Sharpitecture
             string ip = e.Socket.RemoteEndPoint.ToString().Split(':')[0];
             Logger.LogF("{0} connected to the server", LogType.Info, ip);
             Player player = new Player(new Connection(e.Socket));
+        }
+
+        /// <summary>
+        /// Generates the server salt
+        /// </summary>
+        static void GenerateSalt()
+        {
+            Salt = string.Empty;
+            RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
+
+            byte[] tmp = new byte[1];
+
+            for (int i = 0; i < 16;)
+            {
+                rng.GetBytes(tmp);
+                if (!char.IsLetterOrDigit((char)tmp[0]))
+                    continue;
+                Salt += tmp[0].ToString();
+                i++;
+            }
         }
     }
 }
